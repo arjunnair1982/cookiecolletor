@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Draggable Green Squares</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+
+        .square {
+            width: 100px;
+            height: 100px;
+            background-color: #10b981;
+            position: absolute;
+            cursor: move;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: box-shadow 0.2s ease;
+        }
+
+        .square:hover {
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .square.dragging {
+            opacity: 0.7;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
+        }
+
+        #square1 {
+            top: 100px;
+            left: 100px;
+        }
+
+        #square2 {
+            top: 100px;
+            left: 250px;
+        }
+
+        .info {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 18px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="info">Drag the green squares around!</div>
+    <div class="square" id="square1"></div>
+    <div class="square" id="square2"></div>
+
+    <script>
+        const squares = document.querySelectorAll('.square');
+        
+        squares.forEach(square => {
+            let isDragging = false;
+            let offsetX, offsetY;
+
+            square.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                square.classList.add('dragging');
+                
+                offsetX = e.clientX - square.offsetLeft;
+                offsetY = e.clientY - square.offsetTop;
+                
+                square.style.zIndex = Date.now();
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (isDragging && square.classList.contains('dragging')) {
+                    const x = e.clientX - offsetX;
+                    const y = e.clientY - offsetY;
+                    
+                    square.style.left = x + 'px';
+                    square.style.top = y + 'px';
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (isDragging) {
+                    isDragging = false;
+                    square.classList.remove('dragging');
+                }
+            });
+
+            // Touch support for mobile
+            square.addEventListener('touchstart', (e) => {
+                isDragging = true;
+                square.classList.add('dragging');
+                
+                const touch = e.touches[0];
+                offsetX = touch.clientX - square.offsetLeft;
+                offsetY = touch.clientY - square.offsetTop;
+                
+                square.style.zIndex = Date.now();
+                e.preventDefault();
+            });
+
+            document.addEventListener('touchmove', (e) => {
+                if (isDragging && square.classList.contains('dragging')) {
+                    const touch = e.touches[0];
+                    const x = touch.clientX - offsetX;
+                    const y = touch.clientY - offsetY;
+                    
+                    square.style.left = x + 'px';
+                    square.style.top = y + 'px';
+                }
+            });
+
+            document.addEventListener('touchend', () => {
+                if (isDragging) {
+                    isDragging = false;
+                    square.classList.remove('dragging');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
