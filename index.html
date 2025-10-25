@@ -3,127 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Draggable Green Squares</title>
+    <title>Cookie Collector</title>
     <style>
-        body {
+        * {
             margin: 0;
             padding: 0;
-            height: 100vh;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             overflow: hidden;
-            font-family: Arial, sans-serif;
         }
 
-        .square {
-            width: 100px;
-            height: 100px;
-            background-color: #10b981;
-            position: absolute;
-            cursor: move;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-            transition: box-shadow 0.2s ease;
+        .game-container {
+            text-align: center;
+            position: relative;
         }
 
-        .square:hover {
-            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.4);
+        .score-board {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px 40px;
+            border-radius: 20px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
-        .square.dragging {
-            opacity: 0.7;
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
-        }
-
-        #square1 {
-            top: 100px;
-            left: 100px;
-        }
-
-        #square2 {
-            top: 100px;
-            left: 250px;
-        }
-
-        .info {
-            position: absolute;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: white;
+        .score-label {
             font-size: 18px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .score {
+            font-size: 48px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .cookie {
+            width: 150px;
+            height: 150px;
+            font-size: 120px;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+            user-select: none;
+            filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.3));
+        }
+
+        .cookie:hover {
+            transform: scale(1.1);
+        }
+
+        .cookie:active {
+            transform: scale(0.95);
+        }
+
+        .click-effect {
+            position: fixed;
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffd700;
+            pointer-events: none;
+            animation: floatUp 1s ease-out forwards;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        @keyframes floatUp {
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px);
+            }
         }
     </style>
 </head>
 <body>
-    <div class="info">Drag the green squares around!</div>
-    <div class="square" id="square1"></div>
-    <div class="square" id="square2"></div>
+    <div class="game-container">
+        <div class="score-board">
+            <div class="score-label">Cookies Collected</div>
+            <div class="score" id="score">0</div>
+        </div>
+        <div class="cookie" id="cookie">🍪</div>
+    </div>
 
     <script>
-        const squares = document.querySelectorAll('.square');
-        
-        squares.forEach(square => {
-            let isDragging = false;
-            let offsetX, offsetY;
+        let score = 0;
+        const scoreElement = document.getElementById('score');
+        const cookieElement = document.getElementById('cookie');
 
-            square.addEventListener('mousedown', (e) => {
-                isDragging = true;
-                square.classList.add('dragging');
-                
-                offsetX = e.clientX - square.offsetLeft;
-                offsetY = e.clientY - square.offsetTop;
-                
-                square.style.zIndex = Date.now();
-            });
-
-            document.addEventListener('mousemove', (e) => {
-                if (isDragging && square.classList.contains('dragging')) {
-                    const x = e.clientX - offsetX;
-                    const y = e.clientY - offsetY;
-                    
-                    square.style.left = x + 'px';
-                    square.style.top = y + 'px';
-                }
-            });
-
-            document.addEventListener('mouseup', () => {
-                if (isDragging) {
-                    isDragging = false;
-                    square.classList.remove('dragging');
-                }
-            });
-
-            // Touch support for mobile
-            square.addEventListener('touchstart', (e) => {
-                isDragging = true;
-                square.classList.add('dragging');
-                
-                const touch = e.touches[0];
-                offsetX = touch.clientX - square.offsetLeft;
-                offsetY = touch.clientY - square.offsetTop;
-                
-                square.style.zIndex = Date.now();
-                e.preventDefault();
-            });
-
-            document.addEventListener('touchmove', (e) => {
-                if (isDragging && square.classList.contains('dragging')) {
-                    const touch = e.touches[0];
-                    const x = touch.clientX - offsetX;
-                    const y = touch.clientY - offsetY;
-                    
-                    square.style.left = x + 'px';
-                    square.style.top = y + 'px';
-                }
-            });
-
-            document.addEventListener('touchend', () => {
-                if (isDragging) {
-                    isDragging = false;
-                    square.classList.remove('dragging');
-                }
-            });
+        cookieElement.addEventListener('click', function(e) {
+            score++;
+            scoreElement.textContent = score;
+            
+            // Create floating +1 effect
+            const effect = document.createElement('div');
+            effect.className = 'click-effect';
+            effect.textContent = '+1';
+            effect.style.left = e.pageX + 'px';
+            effect.style.top = e.pageY + 'px';
+            document.body.appendChild(effect);
+            
+            // Remove effect after animation
+            setTimeout(() => {
+                effect.remove();
+            }, 1000);
         });
     </script>
 </body>
